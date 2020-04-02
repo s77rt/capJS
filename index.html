@@ -155,8 +155,6 @@
 					const mycap = new capJS(reader.result, format, best_only, export_unauthenticated, ignore_ts, ignore_ie);
 					mycap.Analysis();
 					document.getElementById("id_hcwpaxs").value = mycap.Getf('hcwpax');
-					if (document.getElementById("id_hcwpaxs").value.length)
-						document.getElementById("id_copy_hcwpaxs").click();
 				}
 				reader.readAsArrayBuffer(file);
 			}
