@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="capJS is a javascript library that operates on capture files, a rewrite of multicapconverter">
+		<meta name="keywords" content="capJS, multicapconverter, cap2hccapx, cap2hcwpax">
+		<meta name="author" content="Abdelhafidh Belalia">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<title>capJS - a javascript library that operates on capture files</title>
+		<style>
+			body {
+				color: #D2DAE2;
+				background-color: #18191a;
+				padding: 2rem 0;
+			}
+			textarea {
+				display: inline-block;
+				width: 100%;
+				color: #D2DAE2;
+				background-color: #121314;
+				font-family: monospace;
+				padding: .375rem .75rem;
+				border-radius: .25rem;
+			}
+			textarea:focus {
+				outline: #fc3465 solid 1px;
+			}
+			a, a:focus, a:hover, a:active{
+				color: #fc3465;
+			}
+			.custom-control-input:checked~.custom-control-label::before {
+				border-color: #fc3465;
+				background-color: #fc3465;
+			}
+			hr {
+				border-top: 1px solid rgb(210, 218, 226);
+			}
+			.container {
+				max-width: 768px !important;
+			}
+			.form-check label, label.btn{
+				user-select: none;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>capJS</h1>
+				<p>capJS is a javascript library that operates on capture files, a rewrite of <a href="https://github.com/s77rt/multicapconverter/" target="_blank">multicapconverter</a></p>
+			</header>
+			<hr>
+			<div class="container">
+				<h2 class="display-4">CAP 2 HCWPAX</h2>
+				<p class="lead">Convert a capture file to hcwpax (hashcat mode = 22000)</p>
+				<div class="row">
+					<div class="col">
+						<div class="form-group">
+							<label for="id_cap" class="btn btn-block btn-danger">Choose a Capture file</label>
+							<input type="file" class="d-none" id="id_cap" accept=".cap,.pcap,.pcapng">
+							<a data-toggle="collapse" href="#id_advanced_options" role="button" aria-expanded="false" aria-controls="id_advanced_options">Advanced Options</a>
+							<div class="collapse" id="id_advanced_options">
+								<div class="form-check">
+									<div class="custom-control custom-switch">
+										<input type="checkbox" class="custom-control-input" id="id_best_only" checked>
+										<label class="custom-control-label" for="id_best_only" title="Export one preferred handshake/pmkid per network">Best Only</label>
+									</div>
+								</div>
+								<div class="form-check">
+									<div class="custom-control custom-switch">
+										<input type="checkbox" class="custom-control-input" id="id_export_unauthenticated">
+										<label class="custom-control-label" for="id_export_unauthenticated" title="Export unauthenticated handshakes">Allow unauthenticated (Not Recommended)</label>
+									</div>
+								</div>
+								<div class="form-check">
+									<div class="custom-control custom-switch">
+										<input type="checkbox" class="custom-control-input" id="id_ignore_ts">
+										<label class="custom-control-label" for="id_ignore_ts" title="Ignore timestamps check">Ignore TS (Not Recommended)</label>
+									</div>
+								</div>
+								<div class="form-check">
+									<div class="custom-control custom-switch">
+										<input type="checkbox" class="custom-control-input" id="id_ignore_ie">
+										<label class="custom-control-label" for="id_ignore_ie" title="Ignore information element / AKM Check">Ignore IE (Not Recommended)</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="id_hcwpaxs">Output</label>
+							<textarea rows="10" id="id_hcwpaxs" wrap="off" readonly></textarea>
+							<button class="btn btn-dark btn-block" id="id_copy_hcwpaxs">Copy</button>
+						</div>
+						<div class="form-group">
+							<label for="id_log">Log</label>
+							<textarea rows="5" id="id_log" wrap="off" readonly></textarea>
+						</div>
+					</div>
+				</div>		
+			</div>
+			<hr>
+			<h3>Contribute</h3>
+			<p>If you are having issues with capJS or having any feature requests, feel free to open issues in the <a href="https://github.com/s77rt/capjs/issues/" target="_blank">capJS Github issues page</a> as necessary.</p>
+			<footer>
+				<div class="text-right">
+					<span>v<span id="id_version"></span> capJS, Code licensed MIT</span>
+				</div>
+			</footer>
+		</div>
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+		<script src="js/capjs.min.js"></script>
+		<script>
+			(function () {
+				// Overwrite console
+				var logger = document.getElementById('id_log');
+				console.log = function (message) {
+					if (typeof message == 'object') {
+						logger.value += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '\n';
+					} else {
+						logger.value += message + '\n';
+					}
+				}
+			})();
+			document.getElementById("id_version").innerText = capJS.version;
+			document.getElementById("id_cap").addEventListener("change", function() {
+				document.getElementById("id_log").value = '';
+				document.getElementById("id_hcwpaxs").value = '';
+				var files = this.files;
+				if (files.length) {
+					ReadCap(files[0]);
+				}
+				this.value = '';
+			}, false);
+			document.getElementById("id_copy_hcwpaxs").onclick = function(){
+				document.getElementById("id_hcwpaxs").select();
+				document.execCommand('copy');
+				this.innerText = "Copied!";
+				function revert_innerText(e) {
+					e.innerText = "Copy";
+				}
+				setTimeout(revert_innerText, 2000, this);
+			}
+			function ReadCap(file) {
+				var format = file.name.split('.').pop().toLowerCase();
+				var best_only = document.getElementById('id_best_only').checked;
+				var export_unauthenticated = document.getElementById('id_export_unauthenticated').checked;
+				var ignore_ts = document.getElementById('id_ignore_ts').checked;
+				var ignore_ie = document.getElementById('id_ignore_ie').checked;
+				var reader = new FileReader();
+				reader.onload = function() {
+					const mycap = new capJS(reader.result, format, best_only, export_unauthenticated, ignore_ts, ignore_ie);
+					mycap.Analysis();
+					document.getElementById("id_hcwpaxs").value = mycap.Getf('hcwpax');
+					if (document.getElementById("id_hcwpaxs").value.length)
+						document.getElementById("id_copy_hcwpaxs").click();
+				}
+				reader.readAsArrayBuffer(file);
+			}
+		</script>
+	</body>
+</html>
