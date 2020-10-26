@@ -1,6 +1,6 @@
 'use strict';
 (function() {
-	const CAPJS_VERSION = "0.2.0",
+	const CAPJS_VERSION = "0.2.1",
 		HCWPAX_SIGNATURE = "WPA",
 		TCPDUMP_MAGIC  = 0xa1b2c3d4,
 		TCPDUMP_CIGAM  = 0xd4c3b2a1,
@@ -341,7 +341,6 @@
 								return [pmkid, akm];
 						}
 					}
-					break;
 					pos = pos+2+tag_len;
 				}
 				return;
@@ -455,13 +454,11 @@
 				if (!block_type.length || !block_length.length)
 					break;
 				[block_type, block_length] = [GetUint32(block_type), GetUint32(block_length)];
-				if (BIG_ENDIAN_HOST)
-					block_length = byte_swap_32(block_length);
-				let block_body_length = block_length - 12;
 				if (BIG_ENDIAN_HOST) {
 					block_type = byte_swap_32(block_type);
 					block_length = byte_swap_32(block_length);
 				}
+				let block_body_length = Math.max(block_length - 12, 0);
 				let block = {
 					'block_type': block_type,
 					'block_length': block_length,
@@ -789,7 +786,7 @@
 					this._Log('Oversized packet detected');
 					continue;
 				}
-				let packet = this.__Read(header['caplen']);
+				let packet = this.__Read(Math.max(header['caplen'], 0));
 				if (pcap_file_header['linktype'] == DLT_IEEE802_11_PRISM) {
 					if (header['caplen'] < 144) {
 						this._Log('Could not read prism header');
@@ -1048,7 +1045,7 @@
 			}
 		}
 		__build() {
-			var tmp_tobeadded;
+			var tmp_tobeadded, tmp_key;
 			if (Object.keys(this.db.essids).length === 0) {
 				this._Log('No Networks found');
 				return;
@@ -1188,7 +1185,11 @@
 								data['eapol_len'] = excpkt_ap['eapol_len'];
 								data['eapol'] = excpkt_ap['eapol'];
 							}
-							tmp_tobeadded[Math.abs(excpkt_ap['tv_abs'] - excpkt_sta['tv_abs'])] = [HCWPAX_SIGNATURE, "02", data['keymic'], data['mac_ap'], data['mac_sta'], data['essid'].slice(0, data['essid_len']), data['nonce_ap'], data['eapol'].slice(0, data['eapol_len']), data['message_pair']];
+							tmp_key = Math.abs(excpkt_ap['tv_abs'] - excpkt_sta['tv_abs']);
+							while(tmp_tobeadded[tmp_key])
+								tmp_key += 0.0001;
+							tmp_key = Number(tmp_key.toFixed(4));
+							tmp_tobeadded[tmp_key] = [HCWPAX_SIGNATURE, "02", data['keymic'], data['mac_ap'], data['mac_sta'], data['essid'].slice(0, data['essid_len']), data['nonce_ap'], data['eapol'].slice(0, data['eapol_len']), data['message_pair']];
 						}
 					}
 				}
@@ -1196,7 +1197,11 @@
 					let pmkid = this.db.pmkids[pmkdid_key];
 					if (pmkid['mac_ap'].toString() == essid['bssid'].toString()) {
 						if (this.ignore_ie === true || [AK_PSK, AK_PSKSHA256, AK_SAFE].includes(pmkid['akm'])) {
-							tmp_tobeadded[0] = [HCWPAX_SIGNATURE, "01", pmkid['pmkid'], pmkid['mac_ap'], pmkid['mac_sta'], essid['essid'].slice(0, essid['essid_len']), '', '', ''];
+							tmp_key = 0;
+							while(tmp_tobeadded[tmp_key])
+								tmp_key += 0.0001;
+							tmp_key = Number(tmp_key.toFixed(4));
+							tmp_tobeadded[tmp_key] = [HCWPAX_SIGNATURE, "01", pmkid['pmkid'], pmkid['mac_ap'], pmkid['mac_sta'], essid['essid'].slice(0, essid['essid_len']), '', '', ''];
 						}
 					}
 				}
